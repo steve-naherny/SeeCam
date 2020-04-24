@@ -20,7 +20,7 @@ import android.widget.TextView;
 import com.example.testapp.dummy.DummyContent;
 
 import java.util.List;
-
+import com.example.testapp.InvisibleVideoRecorder;
 /**
  * An activity representing a list of Items. This activity
  * has different presentations for handset and tablet-size devices. On
@@ -45,12 +45,18 @@ public class ItemListActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
+        final InvisibleVideoRecorder recorder = new InvisibleVideoRecorder(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                if(!recorder.isRunning)
+                    recorder.start();
+                else
+                    recorder.stop();
+                String s = recorder.isRunning == true ? "started" : "stopped";
+                Snackbar.make(view, "Camera " + s + "...", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
