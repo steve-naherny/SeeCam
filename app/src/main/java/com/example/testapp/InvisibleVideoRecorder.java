@@ -13,13 +13,20 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Surface;
+import android.view.View;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
 public class InvisibleVideoRecorder {
+
+
+
     private static final String TAG = "InvisibleVideoRecorder";
     private final CameraCaptureSessionStateCallback cameraCaptureSessionStateCallback = new CameraCaptureSessionStateCallback();
     private final CameraDeviceStateCallback cameraDeviceStateCallback = new CameraDeviceStateCallback();

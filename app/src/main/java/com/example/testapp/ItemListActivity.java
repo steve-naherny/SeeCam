@@ -12,6 +12,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,51 @@ public class ItemListActivity extends AppCompatActivity {
      * device.
      */
     private boolean mTwoPane;
+    private InvisibleVideoRecorder recorder;
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event)
+    {
+        int action, keycode;
+
+        action = event.getAction();
+        keycode = event.getKeyCode();
+
+        switch(keycode)
+        {
+
+            case KeyEvent.KEYCODE_VOLUME_UP:
+            {
+                if(KeyEvent.ACTION_UP==action){
+                    if(!recorder.isRunning)
+                    {
+                        recorder.start();
+                        View view = findViewById(R.id.item_list);
+                        Snackbar.make(view, "Camera " + "started" + "...", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                    }
+
+                }
+                break;
+            }
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+            {
+                if(KeyEvent.ACTION_DOWN==action){
+                    if(recorder.isRunning)
+                    {
+                        recorder.stop();
+                        View view = findViewById(R.id.item_list);
+                        Snackbar.make(view, "Camera " + "stopped" + "...", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                    }
+
+                }
+                break;
+            }
+        }
+        return true;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,19 +91,13 @@ public class ItemListActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
-        final InvisibleVideoRecorder recorder = new InvisibleVideoRecorder(this);
+        recorder = new InvisibleVideoRecorder(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!recorder.isRunning)
-                    recorder.start();
-                else
-                    recorder.stop();
-                String s = recorder.isRunning == true ? "started" : "stopped";
-                Snackbar.make(view, "Camera " + s + "...", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
             }
         });
 
