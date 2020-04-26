@@ -118,14 +118,16 @@ public class InvisibleVideoRecorder {
                 CaptureRequest request = builder.build();
                 session.setRepeatingRequest(request, null, handler);
                 mediaRecorder.start();
-            } catch (CameraAccessException e) {
+            } catch (CameraAccessException e)
+            {
                 Log.d(TAG, "onConfigured: " + e.getMessage());
 
             }
         }
 
         @Override
-        public void onSurfacePrepared(CameraCaptureSession session, Surface surface) {
+        public void onSurfacePrepared(CameraCaptureSession session, Surface surface)
+        {
             Log.d(TAG, "onSurfacePrepared: ");
             super.onSurfacePrepared(session, surface);
         }

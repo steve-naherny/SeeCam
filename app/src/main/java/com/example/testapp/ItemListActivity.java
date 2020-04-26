@@ -9,103 +9,29 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.testapp.dummy.DummyContent;
-
 import java.util.List;
-import com.example.testapp.InvisibleVideoRecorder;
-/**
- * An activity representing a list of Items. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link ItemDetailActivity} representing
- * item details. On tablets, the activity presents the list of items and
- * item details side-by-side using two vertical panes.
- */
+
 public class ItemListActivity extends AppCompatActivity {
 
-    /**
-     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device.
-     */
     private boolean mTwoPane;
-    private InvisibleVideoRecorder recorder;
-
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event)
-    {
-        int action, keycode;
-
-        action = event.getAction();
-        keycode = event.getKeyCode();
-
-        switch(keycode)
-        {
-
-            case KeyEvent.KEYCODE_VOLUME_UP:
-            {
-                if(KeyEvent.ACTION_UP==action){
-                    if(!recorder.isRunning)
-                    {
-                        recorder.start();
-                        View view = findViewById(R.id.item_list);
-                        Snackbar.make(view, "Camera " + "started" + "...", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                    }
-
-                }
-                break;
-            }
-            case KeyEvent.KEYCODE_VOLUME_DOWN:
-            {
-                if(KeyEvent.ACTION_DOWN==action){
-                    if(recorder.isRunning)
-                    {
-                        recorder.stop();
-                        View view = findViewById(R.id.item_list);
-                        Snackbar.make(view, "Camera " + "stopped" + "...", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                    }
-
-                }
-                break;
-            }
-        }
-        return true;
-    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        startService(new Intent(this, MyService.class));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_list);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
-        recorder = new InvisibleVideoRecorder(this);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
 
         if (findViewById(R.id.item_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-w900dp).
-            // If this view is present, then the
-            // activity should be in two-pane mode.
             mTwoPane = true;
         }
 

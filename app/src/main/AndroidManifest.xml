@@ -32,6 +32,11 @@
                 android:value="com.example.testapp.ItemListActivity" />
         </activity>
 
+        <receiver android:name=".MyService$RemoteControlReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
         <!-- defining the service class here -->
         <service android:name=".MyService" />
     </application>
