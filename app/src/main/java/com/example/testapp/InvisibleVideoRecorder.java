@@ -13,7 +13,9 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Surface;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +33,7 @@ public class InvisibleVideoRecorder {
     private CameraDevice cameraDevice;
 
     private Handler handler;
+
 
     public InvisibleVideoRecorder(Context context) {
         this.context = context;
@@ -117,6 +120,8 @@ public class InvisibleVideoRecorder {
             }
         }
 
+
+
         @Override
         public void onSurfacePrepared(CameraCaptureSession session, Surface surface) {
             Log.d(TAG, "onSurfacePrepared: ");
@@ -126,6 +131,8 @@ public class InvisibleVideoRecorder {
 
     private class CameraDeviceStateCallback extends CameraDevice.StateCallback {
         private final static String TAG = "CamDeviceStateCb";
+
+
 
         @Override
         public void onClosed(CameraDevice camera) {

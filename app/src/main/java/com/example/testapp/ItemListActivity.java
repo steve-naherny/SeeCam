@@ -1,5 +1,6 @@
 package com.example.testapp;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,81 +13,28 @@ import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import android.os.RemoteException;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.testapp.dummy.DummyContent;
 
 import java.util.List;
-import com.example.testapp.InvisibleVideoRecorder;
-
-
-
-
-
-
-import com.example.testapp.BackgroundAudioService;
-
-import android.content.ComponentName;
-import android.os.RemoteException;
-import android.support.v4.media.MediaBrowserCompat;
-import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
-import android.widget.Button;
+import android.support.v4.media.session.MediaControllerCompat.TransportControls.*;
+import android.widget.Toast;
 /*
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int STATE_PAUSED = 0;
-    private static final int STATE_PLAYING = 1;
 
-    private int mCurrentState;
 
-    private MediaBrowserCompat mMediaBrowserCompat;
-    private MediaControllerCompat mMediaControllerCompat;
-
-    private Button mPlayPauseToggleButton;
-
-    private MediaBrowserCompat.ConnectionCallback mMediaBrowserCompatConnectionCallback = new MediaBrowserCompat.ConnectionCallback() {
-
-        @Override
-        public void onConnected() {
-            super.onConnected();
-            try {
-                mMediaControllerCompat = new MediaControllerCompat(MainActivity.this, mMediaBrowserCompat.getSessionToken());
-                mMediaControllerCompat.registerCallback(mMediaControllerCompatCallback);
-                setSupportMediaController(mMediaControllerCompat);
-                getSupportMediaController().getTransportControls().playFromMediaId(String.valueOf(R.raw.warner_tautz_off_broadway), null);
-
-            } catch( RemoteException e ) {
-
-            }
-        }
-    };
-
-    private MediaControllerCompat.Callback mMediaControllerCompatCallback = new MediaControllerCompat.Callback() {
-
-        @Override
-        public void onPlaybackStateChanged(PlaybackStateCompat state) {
-            super.onPlaybackStateChanged(state);
-            if( state == null ) {
-                return;
-            }
-
-            switch( state.getState() ) {
-                case PlaybackStateCompat.STATE_PLAYING: {
-                    mCurrentState = STATE_PLAYING;
-                    break;
-                }
-                case PlaybackStateCompat.STATE_PAUSED: {
-                    mCurrentState = STATE_PAUSED;
-                    break;
-                }
-            }
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,20 +102,92 @@ public class ItemListActivity extends AppCompatActivity {
      */
     private boolean mTwoPane;
 
+
+    private static final int STATE_PAUSED = 0;
+    private static final int STATE_PLAYING = 1;
+
+    private int mCurrentState;
+
+    private MediaBrowserCompat mMediaBrowserCompat;
+    private MediaControllerCompat mMediaControllerCompat;
+
+    private Button mPlayPauseToggleButton;
+
+
+    private MediaControllerCompat.Callback mMediaControllerCompatCallback = new MediaControllerCompat.Callback() {
+
+        @Override
+        public void onPlaybackStateChanged(PlaybackStateCompat state) {
+            super.onPlaybackStateChanged(state);
+            if( state == null ) {
+                return;
+            }
+
+            switch( state.getState() ) {
+                case PlaybackStateCompat.STATE_PLAYING: {
+                    mCurrentState = STATE_PLAYING;
+                    break;
+                }
+                case PlaybackStateCompat.STATE_PAUSED: {
+                    mCurrentState = STATE_PAUSED;
+                    break;
+                }
+            }
+        }
+    };
+
+    private MediaBrowserCompat.ConnectionCallback mMediaBrowserCompatConnectionCallback = new MediaBrowserCompat.ConnectionCallback() {
+
+        @Override
+        public void onConnected() {
+            super.onConnected();
+            try {
+                mMediaControllerCompat = new MediaControllerCompat(ItemListActivity.this, mMediaBrowserCompat.getSessionToken());
+                mMediaControllerCompat.registerCallback(mMediaControllerCompatCallback);
+                MediaControllerCompat.setMediaController(ItemListActivity.this, mMediaControllerCompat);
+                MediaControllerCompat.getMediaController(ItemListActivity.this).getTransportControls().playFromMediaId(String.valueOf(R.raw.warner_tautz_off_broadway), null);
+            } catch( RemoteException e ) {
+
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_list);
 
+        mMediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(this, BackgroundAudioService.class),
+                mMediaBrowserCompatConnectionCallback, getIntent().getExtras());
+
+        mMediaBrowserCompat.connect();
+
+        //
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
+
+        //
         final InvisibleVideoRecorder recorder = new InvisibleVideoRecorder(this);
 
+        // Add the click functionality
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Start playing audio
+                if( mCurrentState == STATE_PAUSED ) {
+                    MediaControllerCompat.getMediaController(ItemListActivity.this).getTransportControls().play();
+                    mCurrentState = STATE_PLAYING;
+                } else {
+                    if(MediaControllerCompat.getMediaController(ItemListActivity.this).getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING ) {
+                        MediaControllerCompat.getMediaController(ItemListActivity.this).getTransportControls().pause();
+                    }
+
+                    mCurrentState = STATE_PAUSED;
+                }
+
+                // Start recording video
                 if(!recorder.isRunning)
                     recorder.start();
                 else
@@ -177,6 +197,7 @@ public class ItemListActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
 
         if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the

@@ -21,7 +21,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.media.session.PlaybackStateCompat.Builder;
 import android.text.TextUtils;
-import androidx.media.app.NotificationCompat.MediaStyle;
+
 import androidx.core.app.NotificationManagerCompat;
 import androidx.media.session.MediaButtonReceiver;
 import org.jetbrains.annotations.Nullable;
@@ -29,12 +29,24 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.List;
 
+import androidx.media.VolumeProviderCompat;
+import androidx.media.*;
 public class BackgroundAudioService extends MediaBrowserServiceCompat implements MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener  {
 
     public static final String COMMAND_EXAMPLE = "command_example";
 
     private MediaPlayer mMediaPlayer;
     private MediaSessionCompat mMediaSessionCompat;
+
+    private VolumeProviderCompat myVolumeProvider = null;
+    myVolumeProvider = new VolumeProviderCompat(VolumeProviderCompat.VOLUME_CONTROL_RELATIVE, maxVolume, currentVolume) {
+        @Override
+        public void onAdjustVolume(int direction) {
+            // <0 volume down
+            // >0 volume up
+
+        }
+    };
 
     private BroadcastReceiver mNoisyReceiver = new BroadcastReceiver() {
         @Override
@@ -44,8 +56,13 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
             }
         }
     };
-
     private MediaSessionCompat.Callback mMediaSessionCallback = new MediaSessionCompat.Callback() {
+
+        @Override
+        public boolean onMediaButtonEvent(Intent mediaButtonEvent){
+
+            return true;
+        }
 
         @Override
         public void onPlay() {
@@ -181,6 +198,11 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
         ComponentName mediaButtonReceiver = new ComponentName(getApplicationContext(), MediaButtonReceiver.class);
         mMediaSessionCompat = new MediaSessionCompat(getApplicationContext(), "Tag", mediaButtonReceiver, null);
 
+
+
+
+
+        mMediaSessionCompat.setPlaybackToRemote();
         mMediaSessionCompat.setCallback(mMediaSessionCallback);
         mMediaSessionCompat.setFlags( MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS );
 
