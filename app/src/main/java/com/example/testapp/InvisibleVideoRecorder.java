@@ -25,7 +25,7 @@ public class InvisibleVideoRecorder {
     private static final String TAG = "InvisibleVideoRecorder";
     private final CameraCaptureSessionStateCallback cameraCaptureSessionStateCallback = new CameraCaptureSessionStateCallback();
     private final CameraDeviceStateCallback cameraDeviceStateCallback = new CameraDeviceStateCallback();
-    private MediaRecorder mediaRecorder;
+    public MediaRecorder mediaRecorder;
     private CameraManager cameraManager;
     private Context context;
     public boolean isRunning = false;
@@ -43,9 +43,8 @@ public class InvisibleVideoRecorder {
             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
             mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
 
-            final String filename = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + File.separator + "stev.mp4";
-            mediaRecorder.setOutputFile(filename);
-            Log.d(TAG, "start: haiiii" + filename);
+            mediaRecorder.setOutputFile("/storage/emulated/0/Android/data/com.example.testapp/files/Movies/stev.mp4");
+
 
             CamcorderProfile profile = CamcorderProfile.get(CameraMetadata.LENS_FACING_BACK, CamcorderProfile.QUALITY_720P);
             Log.d(TAG, "start: profile " + profile.toString());

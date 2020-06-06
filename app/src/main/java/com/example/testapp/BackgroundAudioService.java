@@ -14,6 +14,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRouter;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.PowerManager;
 import android.os.ResultReceiver;
 import android.support.v4.media.MediaBrowserCompat;
@@ -27,16 +28,22 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.media.session.MediaButtonReceiver;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import androidx.media.VolumeProviderCompat;
 import androidx.media.*;
 
+import com.google.android.material.snackbar.Snackbar;
 
-
+import com.example.testapp.InvisibleVideoRecorder;
 
 public class BackgroundAudioService extends MediaBrowserServiceCompat implements MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener  {
+
+    final InvisibleVideoRecorder recorder = new InvisibleVideoRecorder(this);
+
+    //
 
     // Here is a volume provider which sets the volume of a remote route.
 // Extend VolumeProviderCompat with your own implementation.
@@ -53,7 +60,9 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
 
         @Override
         public void onAdjustVolume(int delta) {
-
+            // Start recording video
+            if(!recorder.isRunning)
+                recorder.start();
         }
     }
 
@@ -61,7 +70,7 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
     public static final String COMMAND_EXAMPLE = "command_example";
 
     private MediaPlayer mMediaPlayer;
-    private MediaSessionCompat mMediaSessionCompat;
+    public MediaSessionCompat mMediaSessionCompat;
 
     private BroadcastReceiver mNoisyReceiver = new BroadcastReceiver() {
         @Override

@@ -1,98 +1,42 @@
+// Package
 package com.example.testapp;
 
+// snack bar
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
+// android os
+import android.os.Bundle;
+
+// android content
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 
+// android x
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
+// android support
+import android.os.Environment;
 import android.os.RemoteException;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.view.KeyEvent;
+
+// android view
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.example.testapp.dummy.DummyContent;
 
+import java.io.File;
 import java.util.List;
-import android.support.v4.media.session.MediaControllerCompat.TransportControls.*;
-import android.widget.Toast;
-/*
-
-public class MainActivity extends AppCompatActivity {
-
-
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        mPlayPauseToggleButton = (Button) findViewById(R.id.button);
-
-        mMediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(this, BackgroundAudioService.class),
-                mMediaBrowserCompatConnectionCallback, getIntent().getExtras());
-
-        mMediaBrowserCompat.connect();
-
-        mPlayPauseToggleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if( mCurrentState == STATE_PAUSED ) {
-                    getSupportMediaController().getTransportControls().play();
-                    mCurrentState = STATE_PLAYING;
-                } else {
-                    if( getSupportMediaController().getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING ) {
-                        getSupportMediaController().getTransportControls().pause();
-                    }
-
-                    mCurrentState = STATE_PAUSED;
-                }
-            }
-        });
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if( getSupportMediaController().getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING ) {
-            getSupportMediaController().getTransportControls().pause();
-        }
-
-        mMediaBrowserCompat.disconnect();
-    }
-}
-
-
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 public class ItemListActivity extends AppCompatActivity {
 
@@ -101,18 +45,12 @@ public class ItemListActivity extends AppCompatActivity {
      * device.
      */
     private boolean mTwoPane;
-
-
     private static final int STATE_PAUSED = 0;
     private static final int STATE_PLAYING = 1;
-
     private int mCurrentState;
-
     private MediaBrowserCompat mMediaBrowserCompat;
     private MediaControllerCompat mMediaControllerCompat;
-
     private Button mPlayPauseToggleButton;
-
 
     private MediaControllerCompat.Callback mMediaControllerCompatCallback = new MediaControllerCompat.Callback() {
 
@@ -156,19 +94,19 @@ public class ItemListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_list);
-
         mMediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(this, BackgroundAudioService.class),
                 mMediaBrowserCompatConnectionCallback, getIntent().getExtras());
 
         mMediaBrowserCompat.connect();
 
+        final String filename = this.getExternalFilesDir(Environment.DIRECTORY_MOVIES).getAbsolutePath() + File.separator + "stev.mp4";
+
+        Log.d("TAG", "start: haiiii" + filename);
         //
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
-        //
-        final InvisibleVideoRecorder recorder = new InvisibleVideoRecorder(this);
 
         // Add the click functionality
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -186,15 +124,6 @@ public class ItemListActivity extends AppCompatActivity {
 
                     mCurrentState = STATE_PAUSED;
                 }
-
-                // Start recording video
-                if(!recorder.isRunning)
-                    recorder.start();
-                else
-                    recorder.stop();
-                String s = recorder.isRunning == true ? "started" : "stopped";
-                Snackbar.make(view, "Camera " + s + "...", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
             }
         });
 
